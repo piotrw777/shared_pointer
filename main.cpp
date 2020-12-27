@@ -6,7 +6,7 @@
 #include <array>
 #include <vector>
 #include <time.h>
-//#include <pthread.h>
+#include <thread>
 
 using namespace std;
 
@@ -84,18 +84,29 @@ void print(vector<shared_ptr<T> >  vec, size_t N = 0) {
 
 typedef vector<shared_ptr<Person> > vecPer;
 
-//typedef  int (Person::*Per_Mem_Fun_int)();
-//typedef  string (Person::*Per_Mem_Fun_str)();
+typedef  int (Person::*Per_Mem_Fun_int)();
+typedef  string (Person::*Per_Mem_Fun_str)();
 
 template<typename T, typename F >
 void person_sort(vector<shared_ptr<T> > &vec, F f) {
     auto compare = [f](shared_ptr<T> p1, shared_ptr<T> p2) {return ((*p1).*f)() <= ((*p2).*f)();};
     sort(vec.begin(), vec.end(), compare);
 }
+
+
 //**************************************************************************
 int main()
 {
-    const int ile_osob = 13;
+
+    //typedef  int (Person::*Per_Mem_Fun_int)();
+    //typedef  string (Person::*Per_Mem_Fun_str)();
+    //typedef vector<shared_ptr<Person> > vecPer;
+
+    //Per_Mem_Fun_int wsk_do_get_age = Person::get_age;
+    //Per_Mem_Fun_str wsk_do_get_name = Person::get_name;
+    //Per_Mem_Fun_str wsk_do_get_surname = Person::get_surname;
+
+    const int ile_osob = 170;
 
     srand(time(0));
 
@@ -108,7 +119,6 @@ int main()
     vecPer & vss = vec_sort_surname;
     vecPer & vsa = vec_sort_age;
 
-
     for(int k = 0; k < ile_osob; k++) {
         vec_all[k] = make_shared<Person>(Random_Person{});
     }
@@ -120,17 +130,32 @@ int main()
     cout << "Wylosowane osoby: VEC_ALL:\n";
     print(vec_all);
 
+    //auto sort_name = [] (vecPer & vec) {cout << "Watek 1" << endl;person_sort(vec,&Person::get_name);};
+    //auto sort_surname = [] (vecPer & vec) {cout << "Watek 2" << endl;person_sort(vec,&Person::get_surname);};
+    //auto sort_age = [] (vecPer & vec) {cout << "Watek 3" << endl;person_sort(vec,&Person::get_age);};
+    //sort_name(vsn);
+
+    person_sort(vsn, &Person::get_name);
+    person_sort(vss, &Person::get_surname);
+    person_sort(vsa, &Person::get_age);
+
+    //const int thr_number = 3;
+    //thread thr[thr_number];
+    //thr[0] = thread(sort_name, ref(vsn));
+    //thr[1] = thread(sort_surname, ref(vss));
+    //thr[2] = thread(sort_age, ref(vsa));
+
+    //for(int k = 0; k < thr_number; k++) {
+    //     thr[k].join();
+    // }
 
     cout << "\nSortowanie po imieniu...\n";
-    person_sort(vsn,Person::get_name);
     print(vsn, 10);
 
     cout << "\nSortowanie po nazwisku...\n";
-    person_sort(vss,Person::get_surname);
     print(vss, 10);
 
     cout << "\nSortowanie po wieku...\n";
-    person_sort(vsa,Person::get_age);
     print(vsa, 10);
 
 }
