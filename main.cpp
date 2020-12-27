@@ -6,6 +6,7 @@
 #include <array>
 #include <vector>
 #include <time.h>
+//#include <pthread.h>
 
 using namespace std;
 
@@ -28,9 +29,9 @@ private:
 public:
     string get_name() {return name;}
     string get_surname() {return surname;}
-    int get_age() {return age;}
+	int get_age() {return age;}
 
-    Person(string name,string surname,int age): name(name), surname(surname), age(age)  {};
+	Person(string name,string surname,int age): name(name), surname(surname), age(age)  {};
     Person() = default;
     Person(Random_Person);
 
@@ -73,18 +74,28 @@ void print(T t) {
 }
 
 template<typename T>
-void print(vector<shared_ptr<T> >  vec) {
-     for(int k = 0; k < vec.size(); k++) {
+void print(vector<shared_ptr<T> >  vec, size_t N = 0) {
+
+     size_t ile = (N == 0 ? vec.size() : min(N, vec.size()));
+     for(int k = 0; k < ile; k++) {
         cout << k + 1 << ". " << *(vec[k]);
     }
 }
 
 typedef vector<shared_ptr<Person> > vecPer;
 
+//typedef  int (Person::*Per_Mem_Fun_int)();
+//typedef  string (Person::*Per_Mem_Fun_str)();
+
+template<typename T, typename F >
+void person_sort(vector<shared_ptr<T> > &vec, F f) {
+    auto compare = [f](shared_ptr<T> p1, shared_ptr<T> p2) {return ((*p1).*f)() <= ((*p2).*f)();};
+    sort(vec.begin(), vec.end(), compare);
+}
 //**************************************************************************
 int main()
 {
-    const int ile_osob = 10;
+    const int ile_osob = 13;
 
     srand(time(0));
 
@@ -106,20 +117,20 @@ int main()
 
     cout << "Use count = " << (vec_all[0]).use_count() << endl;
 
-    cout << "VEC_ALL:\n";
-    print(vec_all);
-    cout << "Sortowanie po wieku...\n";
-
-    auto compare_age = [](shared_ptr<Person> p1, shared_ptr<Person> p2) {return p1->get_age() <= p2->get_age();};
-    sort(vsa.begin(), vsa.end(), compare_age);
-
-    cout << "Po sortowaniu: \n";
-    print(vsa);
-    cout << "VEC_ALL:\n";
+    cout << "Wylosowane osoby: VEC_ALL:\n";
     print(vec_all);
 
 
+    cout << "\nSortowanie po imieniu...\n";
+    person_sort(vsn,Person::get_name);
+    print(vsn, 10);
 
+    cout << "\nSortowanie po nazwisku...\n";
+    person_sort(vss,Person::get_surname);
+    print(vss, 10);
+
+    cout << "\nSortowanie po wieku...\n";
+    person_sort(vsa,Person::get_age);
+    print(vsa, 10);
 
 }
-
