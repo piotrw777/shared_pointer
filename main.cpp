@@ -77,7 +77,7 @@ template<typename T>
 void print(vector<shared_ptr<T> >  vec, size_t N = 0) {
 
      size_t ile = (N == 0 ? vec.size() : min(N, vec.size()));
-     for(int k = 0; k < ile; k++) {
+     for(size_t k = 0; k < ile; k++) {
         cout << k + 1 << ". " << *(vec[k]);
     }
 }
@@ -122,15 +122,18 @@ int main()
     cout << "Wylosowane osoby: VEC_ALL:\n";
     print(vec_all, 30);
 
-    auto sort_name = [] (vecPer & vec) {cout << "Watek 1" << endl;person_sort(vec,&Person::get_name);};
-    auto sort_surname = [] (vecPer & vec) {cout << "Watek 2" << endl;person_sort(vec,&Person::get_surname);};
-    auto sort_age = [] (vecPer & vec) {cout << "Watek 3" << endl;person_sort(vec,&Person::get_age);};
+    //auto sort_name = [] (vecPer & vec) {cout << "Watek 1" << endl;person_sort(vec,&Person::get_name);};
+    //auto sort_surname = [] (vecPer & vec) {cout << "Watek 2" << endl;person_sort(vec,&Person::get_surname);};
+    //auto sort_age = [] (vecPer & vec) {cout << "Watek 3" << endl;person_sort(vec,&Person::get_age);};
 
     const int thr_number = 3;
     thread thr[thr_number];
-    thr[0] = thread(sort_name, ref(vsn));
-    thr[1] = thread(sort_surname, ref(vss));
-    thr[2] = thread(sort_age, ref(vsa));
+    //thr[0] = thread(sort_name, ref(vsn));
+    //thr[1] = thread(sort_surname, ref(vss));
+    //thr[2] = thread(sort_age, ref(vsa));
+    thr[0]= thread(person_sort<Person,Per_Mem_Fun_str>, ref(vsn),&Person::get_name);
+    thr[1]= thread(person_sort<Person,Per_Mem_Fun_str>, ref(vss),&Person::get_surname);
+    thr[2]= thread(person_sort<Person,Per_Mem_Fun_int>, ref(vsa),&Person::get_age);
 
     for(int k = 0; k < thr_number; k++) {
         thr[k].join();
